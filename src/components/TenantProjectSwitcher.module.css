@@ -1,0 +1,12 @@
+.switcher {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+  flex-direction: column;
+
+  label {
+    font-size: larger;
+    font-weight: bold;
+  }
+}
