@@ -1,26 +1,18 @@
-import { useMemo } from 'react';
-import {
-Cell, Legend, Pie,   PieChart, ResponsiveContainer,
-Tooltip} from 'recharts';
-import mockThreats from '../data/threats.json';
-import { useTenantStore } from '../store/useTenantStore';
+import { memo, useMemo } from 'react';
+import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
+import threatsByTenant from '../data/threatsByTenant';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff4d4f'];
 
-export default function CategoryBreakdownChart() {
-  const tenantId = useTenantStore((s) => s.tenantId);
-  const projectId = useTenantStore((s) => s.projectId);
+export const CategoryBreakdownChart = memo(({ tenantId, projectId }: { tenantId: string | null; projectId: string | null }) => {
+  if (!tenantId || !projectId) return null;
 
   const data = useMemo(() => {
+    const threats = threatsByTenant[tenantId]?.[projectId] ?? [];
     const counts: Record<string, number> = {};
-
-    mockThreats.forEach(threat => {
-      if (threat.tenantId !== tenantId) return;
-      if (projectId && threat.projectId !== projectId) return;
-
+    for (const threat of threats) {
       counts[threat.category] = (counts[threat.category] || 0) + 1;
-    });
-
+    }
     return Object.entries(counts).map(([category, value]) => ({ name: category, value }));
   }, [tenantId, projectId]);
 
@@ -34,16 +26,16 @@ export default function CategoryBreakdownChart() {
             dataKey="value"
             nameKey="name"
             outerRadius={100}
+            isAnimationActive={false}
             label
           >
             {data.map((entry, index) => (
               <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
-          <Tooltip />
           <Legend />
         </PieChart>
       </ResponsiveContainer>
     </div>
   );
-}
+});

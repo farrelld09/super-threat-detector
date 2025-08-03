@@ -1,6 +1,6 @@
-import CategoryBreakdownChart from '../components/CategoryBreakdownChart.tsx';
+import { CategoryBreakdownChart } from '../components/CategoryBreakdownChart.tsx';
 import ThreatTable from '../components/ThreatTable';
-import ThreatTrendChart from '../components/ThreatTrendChart.tsx';
+import { ThreatTrendChart } from '../components/ThreatTrendChart.tsx';
 import { tenants } from '../data/tenants';
 import { useTenantStore } from '../store/useTenantStore';
 import styles from './ThreatOverview.module.css';
@@ -28,8 +28,11 @@ export default function ThreatOverview() {
         tenantId={tenantId}
         projectId={projectId}
       />
-      <CategoryBreakdownChart />
-    <ThreatTable />    
+      <CategoryBreakdownChart
+        tenantId={tenantId}
+        projectId={projectId}
+      />
+      <ThreatTable />    
   </div>
   );
 }

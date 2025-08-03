@@ -32,7 +32,7 @@ export function random<T>(list: T[]): T {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function generateThreats(): Threat[] {
+export function generateThreats(): Threat[] {
   const threats: Threat[] = [];
 
   tenants.forEach((tenant) => {
@@ -66,5 +66,3 @@ function generateThreats(): Threat[] {
 
   return threats;
 }
-
-export const mockThreats: Threat[] = generateThreats();

@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Threat } from '../data/mockThreats';
-import mockThreats from '../data/threats.json';
+import threatsByTenant from '../data/threatsByTenant';
 import { useTenantStore } from '../store/useTenantStore';
 import styles from './ThreatTable.module.css';
 
@@ -33,9 +32,8 @@ export default function ThreatTable() {
   const cutoff = getCutoff(timeRange);
   
   const filteredThreats = useMemo(() => {
-    return (mockThreats as Threat[]).filter((threat) => {
-      if (threat.tenantId !== tenantId) return false;
-      if (projectId && threat.projectId !== projectId) return false;
+    const threats = threatsByTenant[tenantId ?? '']?.[projectId ?? ''] ?? [];
+    return threats.filter((threat) => {
       if (severity !== 'All' && threat.severity !== severity) return false;
       if (category !== 'All' && threat.category !== category) return false;
       if (cutoff && new Date(threat.time).getTime() < cutoff) return false;
@@ -83,7 +81,7 @@ export default function ThreatTable() {
           </tr>
         </thead>
         <tbody>
-          {filteredThreats.map((threat: Threat) => (
+          {filteredThreats.map((threat) => (
             <tr key={threat.id}>
               <td>{threat.summary}</td>
               <td>{threat.severity}</td>
