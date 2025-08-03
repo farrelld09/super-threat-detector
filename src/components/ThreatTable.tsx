@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react';
-import threatsByTenant from '../data/threatsByTenant';
-import { useTenantStore } from '../store/useTenantStore';
+import { useMemo, memo, useState } from 'react';
+import { useThreatStore } from '../store/useThreatStore';
 import styles from './ThreatTable.module.css';
 
 const severityOptions = ['All', 'Low', 'Medium', 'High', 'Critical'];
@@ -21,9 +20,8 @@ function getCutoff(range: string): number {
   }
 }
 
-export default function ThreatTable() {
-  const tenantId = useTenantStore((s) => s.tenantId);
-  const projectId = useTenantStore((s) => s.projectId);
+export const ThreatTable = memo(() => {
+  const threats = useThreatStore(s => s.rawThreats);
 
   const [severity, setSeverity] = useState('All');
   const [category, setCategory] = useState('All');
@@ -32,14 +30,13 @@ export default function ThreatTable() {
   const cutoff = getCutoff(timeRange);
   
   const filteredThreats = useMemo(() => {
-    const threats = threatsByTenant[tenantId ?? '']?.[projectId ?? ''] ?? [];
     return threats.filter((threat) => {
       if (severity !== 'All' && threat.severity !== severity) return false;
       if (category !== 'All' && threat.category !== category) return false;
-      if (cutoff && new Date(threat.time).getTime() < cutoff) return false;
+      if (timeRange !== 'All' && (cutoff && new Date(threat.time).getTime() < cutoff)) return false;
       return true;
     });
-  }, [tenantId, projectId, severity, category, cutoff]);
+  }, [threats, severity, category, timeRange, cutoff]);
 
   return (
     <div className={styles.tableContainer}>
@@ -94,4 +91,4 @@ export default function ThreatTable() {
       </table>
     </div>
   );
-}
+})

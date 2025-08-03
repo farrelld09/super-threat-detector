@@ -49,6 +49,6 @@ export const useThreatStore = create<ThreatStore>((set) => ({
     }
     const categoryData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
 
-    set({ rawThreats: all as Threat[], trendData, categoryData });
+    set({ rawThreats: [...all] as Threat[], trendData, categoryData });
   },
 }));

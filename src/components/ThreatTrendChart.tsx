@@ -1,4 +1,4 @@
-import { useMemo, memo } from 'react';
+import { memo } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -9,32 +9,10 @@ import {
   YAxis,
   Tooltip
 } from 'recharts';
-import threatsByTenant from '../data/threatsByTenant';
+import { useThreatStore } from '../store/useThreatStore';
 
-function useTrendData(tenantId: string, projectId: string) {
-  return useMemo(() => {
-    const dataMap: Record<string, Record<string, number>> = {};
-    const threats = threatsByTenant[tenantId]?.[projectId] ?? [];
-
-    for (const threat of threats) {
-      const date = new Date(threat.time);
-      const hourKey = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).toISOString();
-      if (!dataMap[hourKey]) dataMap[hourKey] = { Low: 0, Medium: 0, High: 0, Critical: 0 };
-      dataMap[hourKey][threat.severity]++;
-    }
-
-    return Object.entries(dataMap)
-      .map(([time, counts]) => ({ time, ...counts }))
-      .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-  }, [tenantId, projectId]);
-}
-
-export const ThreatTrendChart = memo(
-  (props: { tenantId: string | null; projectId: string | null }) => {
-    const { tenantId, projectId } = props;
-    if (!tenantId || !projectId) return null;
-
-    const trendData = useTrendData(tenantId, projectId);
+export const ThreatTrendChart = memo(() => {
+  const trendData = useThreatStore(s => s.trendData);
 
     return (
       <div style={{ padding: '1rem' }}>
