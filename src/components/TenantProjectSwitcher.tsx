@@ -1,3 +1,4 @@
+import { startTransition } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tenants } from '../data/tenants';
 import { useTenantStore } from '../store/useTenantStore';
@@ -12,9 +13,12 @@ export default function TenantProjectSwitcher() {
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTenantId = e.target.value;
     const firstProject = tenants.find(t => t.id === newTenantId)?.projects[0] || null;
-    
-    setTenant(newTenantId, firstProject?.id || null);
-    navigate(`/tenant/${newTenantId}${firstProject ? `/project/${firstProject.id}` : ''}`);
+
+    startTransition(() => {
+      setTenant(newTenantId);
+      setProject(firstProject?.id || null);
+      navigate(`/tenant/${newTenantId}${firstProject ? `/project/${firstProject.id}` : ''}`);
+    });
   };
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

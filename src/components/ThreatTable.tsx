@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import styles from './ThreatTable.module.css';
-import { mockThreats } from '../data/mockThreats';
+import { useMemo, useState } from 'react';
 import type { Threat } from '../data/mockThreats';
+import mockThreats from '../data/threats.json';
 import { useTenantStore } from '../store/useTenantStore';
+import styles from './ThreatTable.module.css';
 
 const severityOptions = ['All', 'Low', 'Medium', 'High', 'Critical'];
 const categoryOptions = ['All', 'Runtime', 'Identity', 'Config', 'Network'];
@@ -23,22 +23,25 @@ function getCutoff(range: string): number {
 }
 
 export default function ThreatTable() {
-  const { tenantId, projectId } = useTenantStore();
+  const tenantId = useTenantStore((s) => s.tenantId);
+  const projectId = useTenantStore((s) => s.projectId);
 
   const [severity, setSeverity] = useState('All');
   const [category, setCategory] = useState('All');
   const [timeRange, setTimeRange] = useState('All');
 
   const cutoff = getCutoff(timeRange);
-
-  const filteredThreats = mockThreats.filter((threat: Threat) => {
-    if (threat.tenantId !== tenantId) return false;
-    if (projectId && threat.projectId !== projectId) return false;
-    if (severity !== 'All' && threat.severity !== severity) return false;
-    if (category !== 'All' && threat.category !== category) return false;
-    if (cutoff && new Date(threat.time).getTime() < cutoff) return false;
-    return true;
-  });
+  
+  const filteredThreats = useMemo(() => {
+    return (mockThreats as Threat[]).filter((threat) => {
+      if (threat.tenantId !== tenantId) return false;
+      if (projectId && threat.projectId !== projectId) return false;
+      if (severity !== 'All' && threat.severity !== severity) return false;
+      if (category !== 'All' && threat.category !== category) return false;
+      if (cutoff && new Date(threat.time).getTime() < cutoff) return false;
+      return true;
+    });
+  }, [tenantId, projectId, severity, category, cutoff]);
 
   return (
     <div className={styles.tableContainer}>
@@ -80,7 +83,7 @@ export default function ThreatTable() {
           </tr>
         </thead>
         <tbody>
-          {filteredThreats.map((threat) => (
+          {filteredThreats.map((threat: Threat) => (
             <tr key={threat.id}>
               <td>{threat.summary}</td>
               <td>{threat.severity}</td>

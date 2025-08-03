@@ -18,8 +18,3 @@ export const useProjectId = () => {
   const { projectId } = useTenantStore();
   return projectId;
 };
-
-export const useCurrentTenant = () => {
-  const { tenantId, projectId } = useTenantStore();
-  return { tenantId, projectId };
-};
