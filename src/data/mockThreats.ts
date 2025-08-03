@@ -28,7 +28,7 @@ const severities: Threat['severity'][] = ['Low', 'Medium', 'High', 'Critical'];
 const resourceTypes: Threat['resourceType'][] = ['Pod', 'ServiceAccount', 'Deployment', 'ClusterRole'];
 const categories: Threat['category'][] = ['Runtime', 'Identity', 'Config', 'Network'];
 
-function random<T>(list: T[]): T {
+export function random<T>(list: T[]): T {
   return list[Math.floor(Math.random() * list.length)];
 }
 
@@ -37,17 +37,29 @@ function generateThreats(): Threat[] {
 
   tenants.forEach((tenant) => {
     tenant.projects.forEach((project) => {
-      for (let i = 0; i < 10; i++) {
+      const clusterTimes = Array.from({ length: 10 }, (_, i) =>
+        new Date(Date.now() - i * 2 * 60 * 60 * 1000).toISOString() // every 2 hours
+      );
+
+      for (let i = 0; i < clusterTimes.length; i++) {
         threats.push({
           id: `${project.id}-threat-${i}`,
           summary: random(summaries),
           severity: random(severities),
-          time: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(), // within last 7d
+          time: clusterTimes[i],
           resourceType: random(resourceTypes),
           category: random(categories),
           tenantId: tenant.id,
           projectId: project.id,
         });
+
+        const extraCount = Math.floor(Math.random() * 6);
+        for (let j = 0; j < extraCount; j++) {
+          threats.push({
+            ...threats[threats.length - 1],
+            id: `${project.id}-threat-${i}-${j}`,
+          });
+        }
       }
     });
   });
@@ -56,19 +68,3 @@ function generateThreats(): Threat[] {
 }
 
 export const mockThreats: Threat[] = generateThreats();
-
-export function getThreatsForTenant(tenantId: string): Threat[] {
-  return mockThreats.filter(threat => threat.tenantId === tenantId);
-}
-
-export function getThreatsForProject(tenantId: string, projectId: string): Threat[] {
-  return mockThreats.filter(threat => threat.tenantId === tenantId && threat.projectId === projectId);
-}
-
-export function getThreatsForTenantAndProject(tenantId: string, projectId: string): Threat[] {
-  return mockThreats.filter(threat => threat.tenantId === tenantId && threat.projectId === projectId);
-}
-
-export function getAllThreats(): Threat[] {
-  return mockThreats;
-}
