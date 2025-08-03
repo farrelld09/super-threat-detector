@@ -13,13 +13,3 @@ export const useTenantStore = create<TenantStore>((set) => ({
   setTenant: (tenantId, projectId = null) => set({ tenantId, projectId }),
   setProject: (projectId) => set((state) => ({ ...state, projectId })),
 }));
-
-export const useProjectId = () => {
-  const { projectId } = useTenantStore();
-  return projectId;
-};
-
-export const useCurrentTenant = () => {
-  const { tenantId, projectId } = useTenantStore();
-  return { tenantId, projectId };
-};

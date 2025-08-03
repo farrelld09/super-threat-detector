@@ -1,20 +1,26 @@
+import { startTransition } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tenants } from '../data/tenants';
-import { useTenantStore } from '../store/useTenantStore';
+import { useThreatStore } from '../store/useThreatStore';
 import styles from './TenantProjectSwitcher.module.css';
 
 export default function TenantProjectSwitcher() {
   const { tenantId: routeTenantId, projectId: routeProjectId } = useParams();
   const navigate = useNavigate();
 
-  const { setTenant, setProject } = useTenantStore();
+  const { setTenant, setProject } = useThreatStore();
+  const computeThreatData = useThreatStore((s) => s.computeThreatData);
 
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTenantId = e.target.value;
-    const firstProject = tenants.find(t => t.id === newTenantId)?.projects[0] || null;
-    
-    setTenant(newTenantId, firstProject?.id || null);
-    navigate(`/tenant/${newTenantId}${firstProject ? `/project/${firstProject.id}` : ''}`);
+    const firstProject = tenants.find(t => t.id === newTenantId)?.projects[0] ?? null;
+
+    startTransition(() => {
+      setTenant(newTenantId);
+      setProject(firstProject?.id ?? null);
+      computeThreatData(newTenantId, firstProject?.id ?? null);
+      navigate(`/tenant/${newTenantId}${firstProject ? `/project/${firstProject.id}` : ''}`);
+    });
   };
 
   const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -22,6 +28,7 @@ export default function TenantProjectSwitcher() {
     const newProjectId = e.target.value;
     
     setProject(newProjectId);
+    computeThreatData(routeTenantId, newProjectId ?? null);
     navigate(`/tenant/${routeTenantId}/project/${newProjectId}`);
   };
 
