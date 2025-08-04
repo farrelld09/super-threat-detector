@@ -36,3 +36,22 @@ th {
   padding: 0.25rem;
   font-size: 0.9rem;
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.actions button {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  background: #eee;
+}
+
+.actions button:hover {
+  background: #ccc;
+}

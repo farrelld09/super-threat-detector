@@ -1,4 +1,6 @@
-import { useMemo, memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
+import { type Threat } from '../data/mockThreats'; // or your schema
 import { useThreatStore } from '../store/useThreatStore';
 import styles from './ThreatTable.module.css';
 
@@ -38,6 +40,35 @@ export const ThreatTable = memo(() => {
     });
   }, [threats, severity, category, timeRange, cutoff]);
 
+  function handleInvestigate(threat: Threat) {
+    alert(`Investigating resource: ${threat.summary}`);
+  }
+
+  function handleIsolate(threat: Threat) {
+    toast.success(`Workload ${threat.summary} isolated.`);
+    // or simulate animation here
+  }
+
+  function handleCopySlack(threat: Threat) {
+    const msg = `[${threat.severity}] ${threat.summary} on ${threat.resourceType}`;
+    navigator.clipboard.writeText(msg);
+    toast(`Slack summary copied`);
+  }
+
+  function handleCreateJira(threat: Threat) {
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.write(`
+        <h1>JIRA Ticket</h1>
+        <p><strong>Title:</strong> ${threat.summary}</p>
+        <p><strong>Severity:</strong> ${threat.severity}</p>
+        <p><strong>Category:</strong> ${threat.category}</p>
+        <p><strong>Project:</strong> ${threat.projectId}</p>
+      `);
+    }
+  }
+
+
   return (
     <div className={styles.tableContainer}>
       <div className={styles.filters}>
@@ -75,6 +106,7 @@ export const ThreatTable = memo(() => {
             <th>Time</th>
             <th>Resource</th>
             <th>Category</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -85,10 +117,20 @@ export const ThreatTable = memo(() => {
               <td>{new Date(threat.time).toLocaleString()}</td>
               <td>{threat.resourceType}</td>
               <td>{threat.category}</td>
+              <td>
+                {(threat.severity === 'High' || threat.severity === 'Critical') && (
+                  <div className={styles.actions}>
+                    <button onClick={() => handleInvestigate(threat)}>🔍 Investigate</button>
+                    <button onClick={() => handleIsolate(threat)}>🚫 Isolate</button>
+                    <button onClick={() => handleCopySlack(threat)}>📋 Copy</button>
+                    <button onClick={() => handleCreateJira(threat)}>📄 JIRA</button>
+                  </div>
+                )}
+            </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
   );
-})
+});

@@ -1,13 +1,16 @@
+import AiAssistant from '../components/AiAssistant';
 import { CategoryBreakdownChart } from '../components/CategoryBreakdownChart.tsx';
 import { ThreatTable } from '../components/ThreatTable';
 import { ThreatTrendChart } from '../components/ThreatTrendChart.tsx';
 import { tenants } from '../data/tenants';
-import { useTenantStore } from '../store/useTenantStore';
+import { useThreatStream } from '../helpers/useThreatStream';
+import { useThreatStore } from '../store/useThreatStore.ts';
 import styles from './ThreatOverview.module.css';
 
 export default function ThreatOverview() {
-  const tenantId = useTenantStore((s) => s.tenantId);
-  const projectId = useTenantStore((s) => s.projectId);
+  const tenantId = useThreatStore((s) => s.tenantId);
+  const projectId = useThreatStore((s) => s.projectId);
+  useThreatStream(true, tenantId, projectId);
 
   const tenant = tenants.find(t => t.id === tenantId);
   const project = tenant?.projects.find(p => p.id === projectId);
@@ -26,7 +29,8 @@ export default function ThreatOverview() {
       </p>
       <ThreatTrendChart />
       <CategoryBreakdownChart />
-      <ThreatTable />    
+      <ThreatTable />
+      <AiAssistant />
   </div>
   );
 }
