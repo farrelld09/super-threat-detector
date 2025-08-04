@@ -1,24 +1,24 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   CartesianGrid,
   Legend,
   Line,
   LineChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
-  YAxis,
-  Tooltip
-} from 'recharts';
+  YAxis } from 'recharts';
 import { useThreatStore } from '../store/useThreatStore';
 
 export const ThreatTrendChart = memo(() => {
   const trendData = useThreatStore(s => s.trendData);
+  const memoizedData = useMemo(() => trendData, [trendData]); 
 
     return (
       <div style={{ padding: '1rem' }}>
         <h2>Threat Trend (by Severity)</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={trendData}>
+        <ResponsiveContainer width="100%" height={300} >
+          <LineChart data={memoizedData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="time"
@@ -27,6 +27,7 @@ export const ThreatTrendChart = memo(() => {
             <YAxis domain={[0, 10]} tickCount={11} allowDataOverflow={false} />
             <Tooltip labelFormatter={(v) => new Date(v).toLocaleString()} />
             <Legend />
+            <Legend onMouseEnter={() => {}} onMouseLeave={() => {}} />
             <Line type="monotone" dataKey="Low" stroke="#8884d8" isAnimationActive={false} />
             <Line type="monotone" dataKey="Medium" stroke="#82ca9d" isAnimationActive={false} />
             <Line type="monotone" dataKey="High" stroke="#ffc658" isAnimationActive={false} />

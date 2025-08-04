@@ -7,7 +7,6 @@ export default function DashboardLayout() {
     <div className={styles.layout}>
       <h1>Hero Threat Dashboard</h1>
       <p>Welcome to the Hero Threat Dashboard. Use the switcher below to select a tenant and project.</p>
-      <p>Use the navigation to explore different sections of the dashboard.</p>
       <TenantProjectSwitcher />
       <main>
         <Outlet />

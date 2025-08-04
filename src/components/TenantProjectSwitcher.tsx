@@ -1,4 +1,4 @@
-import { startTransition } from 'react';
+import { startTransition, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { tenants } from '../data/tenants';
 import { useThreatStore } from '../store/useThreatStore';
@@ -10,6 +10,14 @@ export default function TenantProjectSwitcher() {
 
   const { setTenant, setProject } = useThreatStore();
   const computeThreatData = useThreatStore((s) => s.computeThreatData);
+
+  useEffect(() => {
+    if (!routeTenantId || !routeProjectId) {
+      navigate(`/tenant/tenant-1/project/project-1`, { replace: true });
+      computeThreatData('tenant-1', 'project-1');
+    }
+  }, [routeTenantId, routeProjectId, navigate, computeThreatData]);
+
 
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newTenantId = e.target.value;
